@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>ApiHub – Super Admin Dashboard</title>
+
+<style>
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:"Segoe UI",Arial,sans-serif;
+}
+
+body{
+    background:#000;
+    color:#fff;
+    overflow-x:hidden;
+}
+
+/* light leaks */
+.light-top{
+    position:fixed;
+    top:-220px;
+    right:-220px;
+    width:520px;
+    height:520px;
+    background:radial-gradient(circle, rgba(200,200,200,0.18), transparent 65%);
+    pointer-events:none;
+}
+
+.light-bottom{
+    position:fixed;
+    bottom:-220px;
+    left:-220px;
+    width:520px;
+    height:520px;
+    background:radial-gradient(circle, rgba(160,160,160,0.18), transparent 65%);
+    pointer-events:none;
+}
+
+/* navbar */
+.navbar{
+    padding:22px 60px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    border-bottom:1px solid #222;
+}
+
+.logo{
+    font-size:26px;
+    font-weight:700;
+    letter-spacing:3px;
+}
+
+.nav-links{
+    display:flex;
+    gap:36px;
+}
+
+.nav-links a{
+    color:#fff;
+    text-decoration:none;
+    font-size:17px;
+    position:relative;
+}
+
+.nav-links a::after{
+    content:"";
+    position:absolute;
+    left:0;
+    bottom:-6px;
+    width:0;
+    height:2px;
+    background:#fff;
+    transition:0.3s;
+}
+
+.nav-links a:hover::after{
+    width:100%;
+}
+
+/* page */
+.page{
+    padding:60px 80px;
+}
+
+.page h1{
+    font-size:34px;
+    margin-bottom:8px;
+}
+
+.page p{
+    opacity:0.75;
+    margin-bottom:40px;
+}
+
+/* cards */
+.cards{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
+    gap:26px;
+    margin-bottom:50px;
+}
+
+.card{
+    border:1px solid #222;
+    border-radius:12px;
+    padding:26px;
+    background:rgba(0,0,0,0.6);
+}
+
+.card h3{
+    margin-bottom:10px;
+}
+
+.card p{
+    font-size:14px;
+    opacity:0.75;
+    margin-bottom:18px;
+}
+
+.card a{
+    color:#fff;
+    text-decoration:none;
+    font-weight:600;
+    border-bottom:2px solid #fff;
+    padding-bottom:3px;
+}
+
+/* tables */
+.section{
+    margin-bottom:60px;
+}
+
+.section h2{
+    margin-bottom:16px;
+    font-size:22px;
+}
+
+table{
+    width:100%;
+    border-collapse:collapse;
+    border:1px solid #222;
+    background:rgba(0,0,0,0.6);
+}
+
+th,td{
+    padding:14px 12px;
+    text-align:left;
+    font-size:14px;
+    border-bottom:1px solid #222;
+}
+
+th{
+    font-weight:600;
+    opacity:0.9;
+}
+
+tr:hover{
+    background:rgba(255,255,255,0.03);
+}
+
+/* footer */
+footer{
+    border-top:1px solid #222;
+    padding:22px;
+    text-align:center;
+    font-size:13px;
+    opacity:0.7;
+    margin-top:60px;
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="light-top"></div>
+<div class="light-bottom"></div>
+
+<header class="navbar">
+    <div class="logo">APIHUB</div>
+    <div class="nav-links">
+        <a href="dashboard.html">Dashboard</a>
+        <a href="../index.html">Home</a>
+    </div>
+</header>
+
+<section class="page">
+
+    <h1>Super Admin Dashboard</h1>
+    <p>Global control over organizations, platform admins, APIs and billing.</p>
+
+    <!-- Quick modules -->
+    <div class="cards">
+
+        <div class="card">
+            <h3>Organizations</h3>
+            <p>View all registered organizations and their status.</p>
+            <a href="#orgs">View organizations</a>
+        </div>
+
+        <div class="card">
+            <h3>API Services</h3>
+            <p>Manage all API services like OCR, TTS and Chatbot.</p>
+            <a href="#">Coming soon</a>
+        </div>
+
+        <div class="card">
+            <h3>Plans</h3>
+            <p>View and manage service plans and pricing models.</p>
+            <a href="#">Coming soon</a>
+        </div>
+
+        <div class="card">
+            <h3>Platform Admins</h3>
+            <p>Create and verify platform administrators.</p>
+            <a href="#platformadmins">View admins</a>
+        </div>
+
+    </div>
+
+    <!-- Organizations table -->
+    <div class="section" id="orgs">
+
+        <h2>Organizations</h2>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Organization Name</th>
+                    <th>Email</th>
+                    <th>Status</th>
+                    <th>Active Plans</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Dummy rows for now -->
+                <tr>
+                    <td>1</td>
+                    <td>Demo Company</td>
+                    <td>demo@company.com</td>
+                    <td>ACTIVE</td>
+                    <td>OCR Basic</td>
+                </tr>
+                <tr>
+                    <td>2</td>
+                    <td>Test Corp</td>
+                    <td>admin@testcorp.com</td>
+                    <td>ACTIVE</td>
+                    <td>TTS Pro</td>
+                </tr>
+            </tbody>
+        </table>
+
+    </div>
+
+    <!-- Platform admins -->
+    <div class="section" id="platformadmins">
+
+        <h2>Platform Admins</h2>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>User ID</th>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Verification Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Dummy rows -->
+                <tr>
+                    <td>10</td>
+                    <td>Rahul Admin</td>
+                    <td>rahul@apihub.com</td>
+                    <td>PENDING</td>
+                </tr>
+                <tr>
+                    <td>11</td>
+                    <td>Neha Admin</td>
+                    <td>neha@apihub.com</td>
+                    <td>VERIFIED</td>
+                </tr>
+            </tbody>
+        </table>
+
+    </div>
+
+</section>
+
+<footer>
+    © 2026 ApiHub · Super Admin Console
+</footer>
+
+</body>
+</html>

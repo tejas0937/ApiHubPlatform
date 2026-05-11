@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>ApiHub – Organization Dashboard</title>
+
+<style>
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:"Segoe UI",Arial,sans-serif;
+}
+
+body{
+    background:#000;
+    color:#fff;
+    overflow-x:hidden;
+}
+
+.light-top{
+    position:fixed;
+    top:-220px;
+    right:-220px;
+    width:520px;
+    height:520px;
+    background:radial-gradient(circle, rgba(200,200,200,0.18), transparent 65%);
+    pointer-events:none;
+}
+
+.light-bottom{
+    position:fixed;
+    bottom:-220px;
+    left:-220px;
+    width:520px;
+    height:520px;
+    background:radial-gradient(circle, rgba(160,160,160,0.18), transparent 65%);
+    pointer-events:none;
+}
+
+/* navbar */
+.navbar{
+    padding:22px 60px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    border-bottom:1px solid #222;
+}
+
+.logo{
+    font-size:26px;
+    font-weight:700;
+    letter-spacing:3px;
+}
+
+.nav-links{
+    display:flex;
+    gap:36px;
+}
+
+.nav-links a{
+    color:#fff;
+    text-decoration:none;
+    font-size:17px;
+    position:relative;
+}
+
+.nav-links a::after{
+    content:"";
+    position:absolute;
+    left:0;
+    bottom:-6px;
+    width:0;
+    height:2px;
+    background:#fff;
+    transition:0.3s;
+}
+
+.nav-links a:hover::after{
+    width:100%;
+}
+
+/* page */
+.page{
+    padding:60px 80px;
+}
+
+.page h1{
+    font-size:34px;
+    margin-bottom:10px;
+}
+
+.page p{
+    opacity:0.75;
+    margin-bottom:40px;
+}
+
+.cards{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
+    gap:26px;
+}
+
+.card{
+    border:1px solid #222;
+    border-radius:12px;
+    padding:26px;
+    background:rgba(0,0,0,0.6);
+}
+
+.card h3{
+    margin-bottom:12px;
+}
+
+.card p{
+    font-size:14px;
+    opacity:0.75;
+    margin-bottom:18px;
+}
+
+.card a{
+    color:#fff;
+    text-decoration:none;
+    font-weight:600;
+    border-bottom:2px solid #fff;
+    padding-bottom:3px;
+}
+
+/* footer */
+footer{
+    border-top:1px solid #222;
+    padding:22px;
+    text-align:center;
+    font-size:13px;
+    opacity:0.7;
+    margin-top:60px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="light-top"></div>
+<div class="light-bottom"></div>
+
+<header class="navbar">
+    <div class="logo">APIHUB</div>
+    <div class="nav-links">
+        <a href="dashboard.html">Dashboard</a>
+        <a href="add_emp.html">Employees</a>
+        <a href="../index.html">Home</a>
+    </div>
+</header>
+
+<section class="page">
+
+    <h1>Organization Dashboard</h1>
+    <p>Manage your team, APIs and billing from one place.</p>
+
+    <div class="cards">
+
+        <div class="card">
+            <h3>Employees</h3>
+            <p>
+                Add and manage your organization employees
+                and assign Viewer or Finance roles.
+            </p>
+            <a href="add_emp.html">Add employee</a>
+        </div>
+
+        <div class="card">
+            <h3>API Usage</h3>
+            <p>
+                Monitor API usage, limits and consumption.
+            </p>
+            <a href="#">Coming soon</a>
+        </div>
+
+        <div class="card">
+            <h3>Invoices</h3>
+            <p>
+                View invoices and payment history.
+            </p>
+            <a href="#">Coming soon</a>
+        </div>
+
+    </div>
+
+</section>
+
+<footer>
+    © 2026 ApiHub · Organization Console
+</footer>
+
+</body>
+</html>

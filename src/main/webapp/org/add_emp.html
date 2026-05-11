@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>ApiHub – Add Employee</title>
+
+<style>
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:"Segoe UI",Arial,sans-serif;
+}
+
+body{
+    background:#000;
+    color:#fff;
+    overflow-x:hidden;
+}
+
+.light-top{
+    position:fixed;
+    top:-220px;
+    right:-220px;
+    width:520px;
+    height:520px;
+    background:radial-gradient(circle, rgba(200,200,200,0.18), transparent 65%);
+    pointer-events:none;
+}
+
+.light-bottom{
+    position:fixed;
+    bottom:-220px;
+    left:-220px;
+    width:520px;
+    height:520px;
+    background:radial-gradient(circle, rgba(160,160,160,0.18), transparent 65%);
+    pointer-events:none;
+}
+
+/* navbar */
+.navbar{
+    padding:22px 60px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    border-bottom:1px solid #222;
+}
+
+.logo{
+    font-size:26px;
+    font-weight:700;
+    letter-spacing:3px;
+}
+
+.nav-links{
+    display:flex;
+    gap:36px;
+}
+
+.nav-links a{
+    color:#fff;
+    text-decoration:none;
+    font-size:17px;
+    position:relative;
+}
+
+.nav-links a::after{
+    content:"";
+    position:absolute;
+    left:0;
+    bottom:-6px;
+    width:0;
+    height:2px;
+    background:#fff;
+    transition:0.3s;
+}
+
+.nav-links a:hover::after{
+    width:100%;
+}
+
+/* page */
+.page{
+    min-height:75vh;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    padding:40px 20px;
+}
+
+.card{
+    width:100%;
+    max-width:460px;
+    border:1px solid #222;
+    border-radius:12px;
+    padding:30px;
+    background:rgba(0,0,0,0.6);
+}
+
+.card h2{
+    text-align:center;
+    margin-bottom:22px;
+}
+
+input,select{
+    width:100%;
+    padding:12px 14px;
+    background:transparent;
+    border:1px solid #333;
+    border-radius:6px;
+    color:#fff;
+    margin-bottom:16px;
+    outline:none;
+}
+
+select option{
+    color:#000;
+}
+
+button{
+    width:100%;
+    padding:12px;
+    border:none;
+    border-radius:6px;
+    background:#fff;
+    color:#000;
+    font-weight:600;
+    cursor:pointer;
+}
+
+/* footer */
+footer{
+    border-top:1px solid #222;
+    padding:22px;
+    text-align:center;
+    font-size:13px;
+    opacity:0.7;
+}
+</style>
+</head>
+
+<body>
+
+<div class="light-top"></div>
+<div class="light-bottom"></div>
+
+<header class="navbar">
+    <div class="logo">APIHUB</div>
+    <div class="nav-links">
+        <a href="dashboard.html">Dashboard</a>
+        <a href="add_emp.html">Add employee</a>
+        <a href="../index.html">Home</a>
+    </div>
+</header>
+
+<section class="page">
+
+    <div class="card">
+
+        <h2>Add Organization Employee</h2>
+
+        <form method="post" action="../org/add-employee">
+
+            <input type="text" name="name" placeholder="Full name" required>
+
+            <input type="email" name="email" placeholder="Email" required>
+
+            <input type="password" name="password" placeholder="Password" required>
+
+            <select name="role" required>
+                <option value="">Select role</option>
+                <option value="VIEWER">Viewer</option>
+                <option value="FINANCE">Financer</option>
+            </select>
+
+            <button type="submit">Create employee</button>
+
+        </form>
+
+    </div>
+
+</section>
+
+<footer>
+    © 2026 ApiHub · Organization Console
+</footer>
+
+</body>
+</html>
