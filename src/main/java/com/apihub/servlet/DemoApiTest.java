@@ -12,6 +12,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import com.apihub.dao.ApiKeyDAO;
 import com.apihub.dao.ApiUsageLogDAO;
+import com.apihub.dao.PlanDAO;
 import com.apihub.model.ApiKey;
 import com.apihub.model.ApiUsageLog;
 import com.apihub.util.DBUtil;
@@ -41,16 +42,17 @@ public class DemoApiTest extends HttpServlet {
 
         String apiKey = null;
 
-        // ✅ 1. Try reading from header first (BEST PRACTICE)
+        // ✅ Read API key from header
         apiKey = req.getHeader("MyApi");
 
-        // ✅ 2. If not present, read from JSON body
+        // ✅ If not found, read from JSON body
         if (apiKey == null || apiKey.trim().isEmpty()) {
 
             StringBuilder sb = new StringBuilder();
             String line;
 
             try (BufferedReader reader = req.getReader()) {
+
                 while ((line = reader.readLine()) != null) {
                     sb.append(line);
                 }
@@ -58,21 +60,25 @@ public class DemoApiTest extends HttpServlet {
 
             String body = sb.toString();
 
-            // simple JSON parsing (no library)
             if (body.contains("apiKey")) {
+
                 try {
+
                     apiKey = body.split(":")[1]
                                  .replace("\"", "")
                                  .replace("}", "")
                                  .trim();
+
                 } catch (Exception e) {
+
                     apiKey = null;
                 }
             }
         }
 
-        // ❌ No API key found
+        // ❌ Missing API key
         if (apiKey == null || apiKey.trim().isEmpty()) {
+
             resp.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             resp.getWriter().write("Missing API key");
             return;
@@ -81,31 +87,70 @@ public class DemoApiTest extends HttpServlet {
         try (Connection con = DBUtil.getConnection()) {
 
             ApiKeyDAO keyDao = new ApiKeyDAO(con);
+
             ApiKey key = keyDao.findByKey(apiKey);
 
+            // ❌ Invalid API key
             if (key == null) {
+
                 resp.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                 resp.getWriter().write("Invalid API key");
                 return;
             }
 
+            // ✅ QUOTA VALIDATION
+
+            ApiUsageLogDAO usageDao =
+                    new ApiUsageLogDAO(con);
+
+            int currentUsage =
+                    usageDao.countUsageByApiKey(
+                            key.getId()
+                    );
+
+            PlanDAO planDAO = new PlanDAO(con);
+
+            int requestLimit =
+                    planDAO.getRequestLimitBySubscription(
+                            key.getSubscriptionId()
+                    );
+
+            // ❌ Quota exceeded
+            if (currentUsage >= requestLimit) {
+
+                resp.setStatus(429);
+
+                resp.setContentType("application/json");
+
+                resp.getWriter().write(
+                    "{ \"error\": \"API quota exceeded\" }"
+                );
+
+                return;
+            }
+
             // ✅ Log API usage
+
             ApiUsageLog log = new ApiUsageLog();
             log.setApiKeyId(key.getId());
             log.setApiName("Demo");
 
-            ApiUsageLogDAO usageDao = new ApiUsageLogDAO(con);
             usageDao.insert(log);
 
-            // ✅ Response
+            // ✅ Success response
+
             resp.setContentType("application/json");
+
             resp.getWriter().write(
                 "{ \"message\": \"Api processed successfully\" }"
             );
 
         } catch (Exception e) {
+
             e.printStackTrace();
+
             resp.setStatus(500);
+
             resp.getWriter().write("Server error");
         }
     }

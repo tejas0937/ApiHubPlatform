@@ -16,14 +16,19 @@ import com.apihub.util.DBUtil;
 public class LoginServlet extends HttpServlet {
 
     @Override
-    protected void doPost(HttpServletRequest req, HttpServletResponse resp)
+    protected void doPost(HttpServletRequest req,
+                          HttpServletResponse resp)
             throws ServletException, IOException {
-    	 
+
         String email = req.getParameter("email");
         String password = req.getParameter("password");
 
         if (email == null || password == null) {
-            resp.sendRedirect(req.getContextPath() + "/login-page");
+
+            resp.sendRedirect(
+                req.getContextPath() + "/login-page"
+            );
+
             return;
         }
 
@@ -31,54 +36,79 @@ public class LoginServlet extends HttpServlet {
 
             UserDAO userDAO = new UserDAO(con);
 
-            User user = userDAO.findByEmailAndPassword(email, password);
+            User user =
+                    userDAO.findByEmailAndPassword(
+                            email,
+                            password
+                    );
 
             if (user == null) {
-                resp.sendRedirect(req.getContextPath() + "/login-page");
+
+                resp.sendRedirect(
+                    req.getContextPath() + "/login-page"
+                );
+
                 return;
             }
 
-            List<String> roles = userDAO.findRolesByUserId(user.getId());
+            List<String> roles =
+                    userDAO.findRolesByUserId(
+                            user.getId()
+                    );
 
-            HttpSession session = req.getSession(true);
+            HttpSession session =
+                    req.getSession(true);
+
             session.setAttribute("user", user);
             session.setAttribute("roles", roles);
 
-            // ✅ role based dashboard routing
+            // ✅ role based routing
 
             if (roles.contains("SUPER_ADMIN")) {
 
-                req.getRequestDispatcher(
-                        "/WEB-INF/views/superadmin/dashboard.jsp"
-                ).forward(req, resp);
+                resp.sendRedirect(
+                    req.getContextPath()
+                    + "/superadmin/dashboard"
+                );
 
             } else if (roles.contains("PLATFORM_ADMIN")) {
 
-                req.getRequestDispatcher(
-                        "/WEB-INF/views/platform/dashboard.jsp"
-                ).forward(req, resp);
+                resp.sendRedirect(
+                    req.getContextPath()
+                    + "/platform/dashboard"
+                );
 
             } else if (roles.contains("ORG_ADMIN")) {
 
-                req.getRequestDispatcher(
-                        "/WEB-INF/views/org/dashboard.jsp"
-                ).forward(req, resp);
+                resp.sendRedirect(
+                    req.getContextPath()
+                    + "/org/dashboard"
+                );
 
             } else if (roles.contains("ORG_EMP")) {
 
-                req.getRequestDispatcher(
-                        "/WEB-INF/views/org/employee-dashboard.jsp"
-                ).forward(req, resp);
+                resp.sendRedirect(
+                    req.getContextPath()
+                    + "/org/employee-dashboard"
+                );
 
             } else {
 
-                resp.sendRedirect(req.getContextPath() + "/login-page");
+                resp.sendRedirect(
+                    req.getContextPath()
+                    + "/login-page"
+                );
             }
 
         } catch (Exception e) {
+
             e.printStackTrace();
+
             resp.setStatus(500);
-            resp.getWriter().write("Login failed due to server error.");
+
+            resp.getWriter().write(
+                "Login failed due to server error."
+            );
         }
     }
 }

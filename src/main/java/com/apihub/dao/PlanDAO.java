@@ -50,6 +50,30 @@ public class PlanDAO {
         }
     }
 
+    public int getRequestLimitBySubscription(long subscriptionId)
+            throws Exception {
+
+        String sql =
+            "SELECT p.request_limit " +
+            "FROM subscriptions s " +
+            "JOIN plans p ON s.plan_id = p.id " +
+            "WHERE s.id = ?";
+
+        try (PreparedStatement ps = con.prepareStatement(sql)) {
+
+            ps.setLong(1, subscriptionId);
+
+            try (ResultSet rs = ps.executeQuery()) {
+
+                if (rs.next()) {
+                    return rs.getInt("request_limit");
+                }
+            }
+        }
+
+        return 0;
+    }
+    
     public List<Plan> findAll() throws Exception {
 
         List<Plan> list = new ArrayList<>();

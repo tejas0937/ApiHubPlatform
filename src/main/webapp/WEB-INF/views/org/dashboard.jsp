@@ -1,4 +1,7 @@
 <%@ page contentType="text/html;charset=UTF-8" %>
+<%@ page import="java.util.List" %>
+<%@ page import="com.apihub.model.ApiUsageLog" %>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -6,24 +9,40 @@
     <title>ApiHub – Organization Admin</title>
 
     <style>
-        /* Base Styles */
-        * { margin:0; padding:0; box-sizing:border-box; font-family:"Segoe UI",Arial,sans-serif; }
-        body { background:#000; color:#fff; overflow-x:hidden; }
+        *{
+            margin:0;
+            padding:0;
+            box-sizing:border-box;
+            font-family:"Segoe UI",Arial,sans-serif;
+        }
 
-        /* Background Glows */
-        .light-top {
-            position:fixed; top:-220px; right:-220px; width:520px; height:520px;
+        body{
+            background:#000;
+            color:#fff;
+            overflow-x:hidden;
+        }
+
+        .light-top{
+            position:fixed;
+            top:-220px;
+            right:-220px;
+            width:520px;
+            height:520px;
             background:radial-gradient(circle,rgba(200,200,200,.18),transparent 65%);
             pointer-events:none;
         }
-        .light-bottom {
-            position:fixed; bottom:-220px; left:-220px; width:520px; height:520px;
+
+        .light-bottom{
+            position:fixed;
+            bottom:-220px;
+            left:-220px;
+            width:520px;
+            height:520px;
             background:radial-gradient(circle,rgba(160,160,160,.18),transparent 65%);
             pointer-events:none;
         }
 
-        /* Layout */
-        .page {
+        .page{
             min-height:78vh;
             display:flex;
             flex-direction:column;
@@ -32,95 +51,139 @@
             text-align:center;
         }
 
-        .page h1 { font-size:40px; margin-bottom:26px; }
-
-        /* Navigation Cards */
-        .card-container {
-            display: flex;
-            gap: 15px;
-            flex-wrap: wrap;
-            justify-content: center;
-            margin-bottom: 40px;
+        .page h1{
+            font-size:40px;
+            margin-bottom:26px;
         }
 
-        .card {
+        /* analytics cards */
+
+        .analytics-container{
+            display:flex;
+            gap:18px;
+            flex-wrap:wrap;
+            justify-content:center;
+            margin-bottom:35px;
+            width:100%;
+            max-width:900px;
+        }
+
+        .analytics-card{
+            flex:1;
+            min-width:240px;
+            border:1px solid #222;
+            border-radius:12px;
+            padding:24px;
+            background:rgba(10,10,10,.7);
+            text-align:left;
+        }
+
+        .analytics-card h3{
+            font-size:15px;
+            color:#888;
+            margin-bottom:12px;
+        }
+
+        .analytics-card h2{
+            font-size:36px;
+            color:#fff;
+        }
+
+        /* navigation cards */
+
+        .card-container{
+            display:flex;
+            gap:15px;
+            flex-wrap:wrap;
+            justify-content:center;
+            margin-bottom:40px;
+        }
+
+        .card{
             width:300px;
             border:1px solid #222;
             border-radius:12px;
             padding:18px;
-            transition: border 0.3s;
+            transition:border .3s;
         }
 
-        .card:hover { border-color: #444; }
+        .card:hover{
+            border-color:#444;
+        }
 
-        .dash-link {
+        .dash-link{
             display:block;
             text-decoration:none;
             color:#fff;
             font-size:16px;
             position:relative;
-            padding: 10px 0;
+            padding:10px 0;
         }
 
-        /* Table Section Styles */
-        .log-container {
-            width: 100%;
-            max-width: 900px;
-            background: rgba(10, 10, 10, 0.5);
-            border: 1px solid #222;
-            border-radius: 12px;
-            padding: 30px;
-            margin-top: 20px;
+        /* logs section */
+
+        .log-container{
+            width:100%;
+            max-width:900px;
+            background:rgba(10,10,10,.5);
+            border:1px solid #222;
+            border-radius:12px;
+            padding:30px;
+            margin-top:20px;
         }
 
-        .log-container h2 {
-            font-size: 22px;
-            margin-bottom: 20px;
-            text-align: left;
-            border-left: 3px solid #fff;
-            padding-left: 15px;
+        .log-container h2{
+            font-size:22px;
+            margin-bottom:20px;
+            text-align:left;
+            border-left:3px solid #fff;
+            padding-left:15px;
         }
 
-        .usage-table {
-            width: 100%;
-            border-collapse: collapse;
-            text-align: left;
+        .usage-table{
+            width:100%;
+            border-collapse:collapse;
+            text-align:left;
         }
 
-        .usage-table th {
-            border-bottom: 2px solid #222;
-            padding: 12px 15px;
-            font-size: 13px;
-            color: #666;
-            text-transform: uppercase;
-            letter-spacing: 1px;
+        .usage-table th{
+            border-bottom:2px solid #222;
+            padding:12px 15px;
+            font-size:13px;
+            color:#666;
+            text-transform:uppercase;
+            letter-spacing:1px;
         }
 
-        .usage-table td {
-            padding: 15px;
-            border-bottom: 1px solid #111;
-            font-size: 14px;
-            color: #ccc;
+        .usage-table td{
+            padding:15px;
+            border-bottom:1px solid #111;
+            font-size:14px;
+            color:#ccc;
         }
 
-        .usage-table tr:last-child td { border-bottom: none; }
-        
-        .usage-table tr:hover { background: rgba(255, 255, 255, 0.02); }
-
-        code {
-            background: #1a1a1a;
-            padding: 3px 6px;
-            border-radius: 4px;
-            font-family: "Consolas", monospace;
-            color: #aaa;
+        .usage-table tr:last-child td{
+            border-bottom:none;
         }
 
-        .usage-count {
-            font-weight: bold;
-            color: #fff;
+        .usage-table tr:hover{
+            background:rgba(255,255,255,.02);
         }
 
-        footer {
+        code{
+            background:#1a1a1a;
+            padding:3px 6px;
+            border-radius:4px;
+            font-family:"Consolas",monospace;
+            color:#aaa;
+        }
+
+        .usage-count{
+            font-weight:bold;
+            color:#fff;
+        }
+
+        footer{
             border-top:1px solid #222;
             padding:22px;
             text-align:center;
@@ -141,45 +204,139 @@
 
     <h1>Organization Admin Panel</h1>
 
-    <div class="card-container">
-        <div class="card">
-            <a class="dash-link" href="<%=request.getContextPath()%>/org/add-employee">
-                View Employees
-            </a>
+    <!-- analytics -->
+
+    <div class="analytics-container">
+
+        <div class="analytics-card">
+            <h3>Total API Calls</h3>
+
+            <h2>
+                <%= request.getAttribute("totalApiCalls") != null
+                    ? request.getAttribute("totalApiCalls")
+                    : 0 %>
+            </h2>
         </div>
-        <div class="card">
-            <a class="dash-link" href="<%=request.getContextPath()%>/org/api-keys">
-                Manage API keys
-            </a>
+
+        <div class="analytics-card">
+            <h3>Total API Keys</h3>
+
+            <h2>
+                <%= request.getAttribute("totalApiKeys") != null
+                    ? request.getAttribute("totalApiKeys")
+                    : 0 %>
+            </h2>
         </div>
-        <div class="card">
-            <a class="dash-link" href="<%=request.getContextPath()%>/org/plans">
-                Subscribe to plan
-            </a>
-        </div>
+
     </div>
 
+    <!-- navigation -->
+
+    <div class="card-container">
+
+        <div class="card">
+            <a class="dash-link"
+               href="<%=request.getContextPath()%>/org/add-employee">
+
+                View Employees
+
+            </a>
+        </div>
+
+        <div class="card">
+            <a class="dash-link"
+               href="<%=request.getContextPath()%>/org/api-keys">
+
+                Manage API keys
+
+            </a>
+        </div>
+
+        <div class="card">
+            <a class="dash-link"
+               href="<%=request.getContextPath()%>/org/plans">
+
+                Subscribe to plan
+
+            </a>
+        </div>
+
+    </div>
+
+    <!-- usage logs -->
+
     <div class="log-container">
+
         <h2>View Usage Logs</h2>
+
         <table class="usage-table">
+
             <thead>
                 <tr>
-                    <th>API Key</th>
-                    <th>Service ID</th>
+                    <th>API Key ID</th>
+                    <th>API Name</th>
                     <th>Subscription ID</th>
                     <th>Usage (Hits)</th>
                 </tr>
             </thead>
+
             <tbody>
+
+<%
+List<ApiUsageLog> logs = (List<ApiUsageLog>) request.getAttribute("usageLogs");
+
+if (logs != null && !logs.isEmpty()) {
+
+    for (ApiUsageLog log : logs) {
+%>
+
                 <tr>
-                    <td><code>168bc93e-5235-4a2c-bbca-23b3cf2ae82c</code></td>
-                    <td>MyApi</td>
-                    <td>101</td>
-                    <td class="usage-count">137</td>
+
+                    <td>
+                        <code>
+                            <%= log.getApiKeyId() %>
+                        </code>
+                    </td>
+
+                    <td>
+                        <%= log.getApiName() %>
+                    </td>
+
+                    <td>
+                        <%= log.getSubscriptionId() %>
+                    </td>
+
+                    <td class="usage-count">
+                        <%= log.getHits() %>
+                    </td>
+
                 </tr>
-                
+
+<%
+    }
+
+} else {
+%>
+
+                <tr>
+
+                    <td colspan="4"
+                        style="text-align:center;padding:20px;">
+
+                        No usage logs found
+
+                    </td>
+
+                </tr>
+
+<%
+}
+%>
+
             </tbody>
+
         </table>
+
     </div>
 
 </section>

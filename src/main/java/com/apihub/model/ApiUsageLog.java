@@ -9,6 +9,25 @@ public class ApiUsageLog {
     private String apiName;
     private LocalDateTime createdAt;
 
+    private long subscriptionId;
+    private int hits;
+    
+    public long getSubscriptionId() {
+        return subscriptionId;
+    }
+
+    public void setSubscriptionId(long subscriptionId) {
+        this.subscriptionId = subscriptionId;
+    }
+
+    public int getHits() {
+        return hits;
+    }
+
+    public void setHits(int hits) {
+        this.hits = hits;
+    }
+    
     public long getId() { return id; }
     public void setId(long id) { this.id = id; }
 
