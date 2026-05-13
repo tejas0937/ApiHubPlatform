@@ -62,7 +62,23 @@ public class ApiKeyDAO {
             ps.executeUpdate();
         }
     }
+    public void updateStatus(long keyId,
+            String status)
+throws Exception {
 
+String sql =
+"UPDATE api_keys SET status=? WHERE id=?";
+
+try (PreparedStatement ps =
+con.prepareStatement(sql)) {
+
+ps.setString(1, status);
+ps.setLong(2, keyId);
+
+ps.executeUpdate();
+}
+}
+    
     public ApiKey findByKey(String apiKey) throws Exception {
 
         String sql =

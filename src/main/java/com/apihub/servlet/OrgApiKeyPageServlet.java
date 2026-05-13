@@ -26,10 +26,11 @@ public class OrgApiKeyPageServlet extends HttpServlet {
         HttpSession session = req.getSession(false);
 
         if (session == null) {
-            resp.sendRedirect(req.getContextPath() + "/login.jsp");
+            resp.sendRedirect(req.getContextPath() + "/login-page");
             return;
         }
 
+        
         @SuppressWarnings("unchecked")
         List<String> roles =
                 (List<String>) session.getAttribute("roles");
@@ -42,7 +43,7 @@ public class OrgApiKeyPageServlet extends HttpServlet {
         User user = (User) session.getAttribute("user");
 
         if (user == null) {
-            resp.sendRedirect(req.getContextPath() + "/login.jsp");
+            resp.sendRedirect(req.getContextPath() + "/login-page");
             return;
         }
 
@@ -64,6 +65,44 @@ public class OrgApiKeyPageServlet extends HttpServlet {
             resp.sendError(
                 HttpServletResponse.SC_INTERNAL_SERVER_ERROR
             );
+        }
+        
+    }
+    @Override
+    protected void doPost(HttpServletRequest req,
+                          HttpServletResponse resp)
+            throws ServletException, IOException {
+
+        try {
+
+            long keyId =
+                Long.parseLong(
+                    req.getParameter("keyId")
+                );
+
+            String status =
+                req.getParameter("status");
+
+            try (Connection con =
+                    DBUtil.getConnection()) {
+
+                ApiKeyDAO dao =
+                        new ApiKeyDAO(con);
+
+                dao.updateStatus(
+                    keyId,
+                    status
+                );
+            }
+
+            resp.sendRedirect(
+                req.getContextPath()
+                + "/org/api-keys"
+            );
+
+        } catch (Exception e) {
+
+            throw new ServletException(e);
         }
     }
 }

@@ -4,8 +4,6 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.sql.Connection;
 
-import javax.servlet.ServletException;
-import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -17,41 +15,29 @@ import com.apihub.model.ApiKey;
 import com.apihub.model.ApiUsageLog;
 import com.apihub.util.DBUtil;
 
-@WebServlet("/api/demotest")
-public class DemoApiTest extends HttpServlet {
+public abstract class BaseApiServlet extends HttpServlet {
 
-    @Override
-    protected void doPost(HttpServletRequest req,
+    protected abstract String getApiName();
+
+    protected abstract void processRequest(
+            HttpServletRequest req,
+            HttpServletResponse resp)
+            throws Exception;
+
+    protected void handle(HttpServletRequest req,
                           HttpServletResponse resp)
-            throws ServletException, IOException {
-
-        handle(req, resp);
-    }
-
-    @Override
-    protected void doGet(HttpServletRequest req,
-                         HttpServletResponse resp)
-            throws ServletException, IOException {
-
-        handle(req, resp);
-    }
-
-    private void handle(HttpServletRequest req,
-                        HttpServletResponse resp)
             throws IOException {
 
-        String apiKey = null;
+        String apiKey = req.getHeader("MyApi");
 
-        // ✅ Read API key from header
-        apiKey = req.getHeader("MyApi");
-
-        // ✅ If not found, read from JSON body
+        // fallback JSON body
         if (apiKey == null || apiKey.trim().isEmpty()) {
 
             StringBuilder sb = new StringBuilder();
             String line;
 
-            try (BufferedReader reader = req.getReader()) {
+            try (BufferedReader reader =
+                    req.getReader()) {
 
                 while ((line = reader.readLine()) != null) {
                     sb.append(line);
@@ -59,6 +45,7 @@ public class DemoApiTest extends HttpServlet {
             }
 
             String body = sb.toString();
+            req.setAttribute("requestBody", body);
 
             if (body.contains("apiKey")) {
 
@@ -76,31 +63,51 @@ public class DemoApiTest extends HttpServlet {
             }
         }
 
-        // ❌ Missing API key
+        // missing key
         if (apiKey == null || apiKey.trim().isEmpty()) {
 
-            resp.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            resp.getWriter().write("Missing API key");
+            resp.setStatus(401);
+
+            resp.getWriter().write(
+                "Missing API key"
+            );
+
             return;
         }
-        
 
         try (Connection con = DBUtil.getConnection()) {
 
-            ApiKeyDAO keyDao = new ApiKeyDAO(con);
+            ApiKeyDAO keyDao =
+                    new ApiKeyDAO(con);
 
-            ApiKey key = keyDao.findByKey(apiKey);
+            ApiKey key =
+                    keyDao.findByKey(apiKey);
 
-            // ❌ Invalid API key
+            // invalid key
             if (key == null) {
 
-                resp.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-                resp.getWriter().write("Invalid API key");
+                resp.setStatus(401);
+
+                resp.getWriter().write(
+                    "Invalid API key"
+                );
+
                 return;
             }
 
-            // ✅ QUOTA VALIDATION
+            // revoked key
+            if (!"ACTIVE".equals(key.getStatus())) {
 
+                resp.setStatus(403);
+
+                resp.getWriter().write(
+                    "API key revoked"
+                );
+
+                return;
+            }
+
+            // quota validation
             ApiUsageLogDAO usageDao =
                     new ApiUsageLogDAO(con);
 
@@ -109,19 +116,21 @@ public class DemoApiTest extends HttpServlet {
                             key.getId()
                     );
 
-            PlanDAO planDAO = new PlanDAO(con);
+            PlanDAO planDAO =
+                    new PlanDAO(con);
 
             int requestLimit =
                     planDAO.getRequestLimitBySubscription(
                             key.getSubscriptionId()
                     );
 
-            // ❌ Quota exceeded
             if (currentUsage >= requestLimit) {
 
                 resp.setStatus(429);
 
-                resp.setContentType("application/json");
+                resp.setContentType(
+                    "application/json"
+                );
 
                 resp.getWriter().write(
                     "{ \"error\": \"API quota exceeded\" }"
@@ -130,21 +139,17 @@ public class DemoApiTest extends HttpServlet {
                 return;
             }
 
-            // ✅ Log API usage
+            // actual API processing
+            processRequest(req, resp);
 
-            ApiUsageLog log = new ApiUsageLog();
+            // usage logging
+            ApiUsageLog log =
+                    new ApiUsageLog();
+
             log.setApiKeyId(key.getId());
-            log.setApiName("Demo");
+            log.setApiName(getApiName());
 
             usageDao.insert(log);
-
-            // ✅ Success response
-
-            resp.setContentType("application/json");
-
-            resp.getWriter().write(
-                "{ \"message\": \"Api processed successfully\" }"
-            );
 
         } catch (Exception e) {
 
@@ -152,7 +157,9 @@ public class DemoApiTest extends HttpServlet {
 
             resp.setStatus(500);
 
-            resp.getWriter().write("Server error");
+            resp.getWriter().write(
+                "Server error"
+            );
         }
     }
 }
