@@ -7,6 +7,9 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+
 @WebServlet("/api/wordcount")
 public class WordCountApiServlet extends BaseApiServlet {
 
@@ -24,29 +27,17 @@ public class WordCountApiServlet extends BaseApiServlet {
         String body =
             (String) req.getAttribute("requestBody");
 
-        String text = "";
+        JsonObject json =
+            JsonParser.parseString(body)
+                      .getAsJsonObject();
 
-        if (body != null && body.contains("text")) {
-
-            try {
-
-            	text = body.substring(
-                        body.indexOf(":") + 1
-                   )
-                   .replace("\"", "")
-                   .replace("}", "")
-                   .replace("{", "")
-                   .trim();
-            	
-            } catch (Exception e) {
-
-                text = "";
-            }
-        }
+        String text =
+            json.get("text").getAsString();
 
         int wordCount = 0;
 
-        if (!text.isEmpty()) {
+        if (text != null &&
+            !text.trim().isEmpty()) {
 
             wordCount =
                 text.trim()

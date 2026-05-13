@@ -30,40 +30,48 @@ public abstract class BaseApiServlet extends HttpServlet {
 
         String apiKey = req.getHeader("MyApi");
 
-        // fallback JSON body
-        if (apiKey == null || apiKey.trim().isEmpty()) {
+        // ✅ Always read request body
 
-            StringBuilder sb = new StringBuilder();
-            String line;
+        StringBuilder sb = new StringBuilder();
+        String line;
 
-            try (BufferedReader reader =
-                    req.getReader()) {
+        try (BufferedReader reader =
+                req.getReader()) {
 
-                while ((line = reader.readLine()) != null) {
-                    sb.append(line);
-                }
-            }
-
-            String body = sb.toString();
-            req.setAttribute("requestBody", body);
-
-            if (body.contains("apiKey")) {
-
-                try {
-
-                    apiKey = body.split(":")[1]
-                                 .replace("\"", "")
-                                 .replace("}", "")
-                                 .trim();
-
-                } catch (Exception e) {
-
-                    apiKey = null;
-                }
+            while ((line = reader.readLine()) != null) {
+                sb.append(line);
             }
         }
 
-        // missing key
+        String body = sb.toString();
+
+        // ✅ Store request body for child APIs
+
+        req.setAttribute("requestBody", body);
+
+        // ✅ fallback apiKey from JSON body
+
+        if ((apiKey == null || apiKey.trim().isEmpty())
+                && body.contains("apiKey")) {
+
+            try {
+
+                apiKey = body.substring(
+                            body.indexOf(":") + 1
+                         )
+                         .replace("\"", "")
+                         .replace("}", "")
+                         .replace("{", "")
+                         .trim();
+
+            } catch (Exception e) {
+
+                apiKey = null;
+            }
+        }
+
+        // ❌ Missing API key
+
         if (apiKey == null || apiKey.trim().isEmpty()) {
 
             resp.setStatus(401);
@@ -83,7 +91,8 @@ public abstract class BaseApiServlet extends HttpServlet {
             ApiKey key =
                     keyDao.findByKey(apiKey);
 
-            // invalid key
+            // ❌ Invalid key
+
             if (key == null) {
 
                 resp.setStatus(401);
@@ -95,7 +104,8 @@ public abstract class BaseApiServlet extends HttpServlet {
                 return;
             }
 
-            // revoked key
+            // ❌ Revoked key
+
             if (!"ACTIVE".equals(key.getStatus())) {
 
                 resp.setStatus(403);
@@ -107,7 +117,8 @@ public abstract class BaseApiServlet extends HttpServlet {
                 return;
             }
 
-            // quota validation
+            // ✅ Quota validation
+
             ApiUsageLogDAO usageDao =
                     new ApiUsageLogDAO(con);
 
@@ -139,10 +150,12 @@ public abstract class BaseApiServlet extends HttpServlet {
                 return;
             }
 
-            // actual API processing
+            // ✅ Actual API processing
+
             processRequest(req, resp);
 
-            // usage logging
+            // ✅ Usage logging
+
             ApiUsageLog log =
                     new ApiUsageLog();
 
