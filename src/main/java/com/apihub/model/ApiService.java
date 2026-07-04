@@ -6,6 +6,10 @@ public class ApiService {
     private String name;
     private String description;
     private String status;
+    private String endpoint;
+    private String httpMethod;
+    private String requestJson;
+    private String responseJson;
 
     public long getId() {
         return id;
@@ -37,5 +41,37 @@ public class ApiService {
 
     public void setStatus(String status) {
         this.status = status;
+    }
+
+    public String getEndpoint() {
+        return endpoint;
+    }
+
+    public void setEndpoint(String endpoint) {
+        this.endpoint = endpoint;
+    }
+
+    public String getHttpMethod() {
+        return httpMethod;
+    }
+
+    public void setHttpMethod(String httpMethod) {
+        this.httpMethod = httpMethod;
+    }
+
+    public String getRequestJson() {
+        return requestJson;
+    }
+
+    public void setRequestJson(String requestJson) {
+        this.requestJson = requestJson;
+    }
+
+    public String getResponseJson() {
+        return responseJson;
+    }
+
+    public void setResponseJson(String responseJson) {
+        this.responseJson = responseJson;
     }
 }

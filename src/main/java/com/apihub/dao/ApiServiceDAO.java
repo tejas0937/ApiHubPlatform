@@ -16,30 +16,14 @@ public class ApiServiceDAO {
         this.con = con;
     }
 
-    // add api service
-    public void insert(ApiService api) throws Exception {
-
-        String sql =
-            "INSERT INTO api_services (name, description, status) " +
-            "VALUES (?, ?, ?)";
-
-        try (PreparedStatement ps = con.prepareStatement(sql)) {
-
-            ps.setString(1, api.getName());
-            ps.setString(2, api.getDescription());
-            ps.setString(3, api.getStatus());
-
-            ps.executeUpdate();
-        }
-    }
-
-    // list all api services
     public List<ApiService> findAll() throws Exception {
 
         List<ApiService> list = new ArrayList<>();
 
         String sql =
-            "SELECT id, name, description, status FROM api_services";
+            "SELECT id, name, description, status, endpoint, http_method, request_json, response_json " +
+            "FROM api_services " +
+            "ORDER BY name";
 
         try (PreparedStatement ps = con.prepareStatement(sql);
              ResultSet rs = ps.executeQuery()) {
@@ -52,6 +36,10 @@ public class ApiServiceDAO {
                 api.setName(rs.getString("name"));
                 api.setDescription(rs.getString("description"));
                 api.setStatus(rs.getString("status"));
+                api.setEndpoint(rs.getString("endpoint"));
+                api.setHttpMethod(rs.getString("http_method"));
+                api.setRequestJson(rs.getString("request_json"));
+                api.setResponseJson(rs.getString("response_json"));
 
                 list.add(api);
             }
